@@ -1,7 +1,7 @@
 public class OtherBank extends Bank{
     private String bankName;
-    public OtherBank(int accountNumber, String username, String bankName) {
-        super(accountNumber, username);
+    public OtherBank(int accountNumber, String username, String bankName, int balance) {
+        super(accountNumber, username, balance);
         this.bankName = bankName;
     }
 

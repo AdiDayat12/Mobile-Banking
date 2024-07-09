@@ -1,10 +1,12 @@
 public abstract class Bank {
     private int accountNumber;
     private String username;
+    private int balance;
 
-    public Bank (int accountNumber, String username){
+    public Bank (int accountNumber, String username, int balance){
         this.accountNumber = accountNumber;
         this.username = username;
+        this.balance = balance;
     }
 
     public int getAccountNumber() {
@@ -21,5 +23,9 @@ public abstract class Bank {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void deposit(int money) {
+        balance += money;
     }
 }
