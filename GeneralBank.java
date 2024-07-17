@@ -1,6 +1,6 @@
-public class OtherBank extends Bank{
+public class GeneralBank extends Bank{
     private String bankName;
-    public OtherBank(int accountNumber, String username, String bankName, int balance) {
+    public GeneralBank(int accountNumber, String username, String bankName, int balance) {
         super(accountNumber, username, balance);
         this.bankName = bankName;
     }
