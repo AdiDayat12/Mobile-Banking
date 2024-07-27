@@ -3,41 +3,45 @@ import java.util.Scanner;
 
 public class M_Transfer {
 
-    private final BankList bankList;
-    MyAccount myAccount = new MyAccount();
-
-    public M_Transfer(BankList bankList){
-        this.bankList = bankList;
-    }
-
     // Transfer among local accounts
-    public void transferLocal (){
+    public void transferLocal (BankList bankList, MyAccount myAccount){
         Scanner scanner = new Scanner(System.in);
         while (true){
             int getNumber = getAccountNumberFromUser(scanner);
             if (getNumber == -1){
                 continue;
+            } else if (getNumber == 0) {
+                break;
             }
-            LocalBank targetAccount = findAccountLocal(getNumber);
+            LocalBank targetAccount = findAccountLocal(getNumber, bankList);
             if (targetAccount == null){
                 System.out.println("Account not found. Please enter valid number account : ");
                 continue;
             }
-            int moneyInput = moneyToTransfer(scanner);
+            int moneyInput = moneyToTransfer(scanner, myAccount);
 
+            if (moneyInput == 0){
+                System.out.println("Cannot transfer 0");
+                continue;
+            }
             while (moneyInput == -1) {
                 System.out.println("Your balance is not enough.\n1. Check Balance\n2. Continue Transfer : ");
                 int choice = scanner.nextInt();
                 if (choice == 1){
                     System.out.println("Your balance : " + myAccount.getBalance());
                 }else if (choice == 2){
-                    moneyInput = moneyToTransfer(scanner);
+                    moneyInput = moneyToTransfer(scanner, myAccount);
                 }else {
                     System.out.println("Invalid input. Please choice 1 or 2");
                 }
             }
 
-            doTransfer(targetAccount, moneyInput);
+            System.out.println("Are you sure want to do this tranfer ? y / n");
+            String validate = scanner.next();
+            if (validate.equalsIgnoreCase("n")){
+                break;
+            }
+            doTransfer(targetAccount, moneyInput, myAccount);
             System.out.println("Your current balance : " + myAccount.getBalance());
             break;
         }
@@ -45,19 +49,26 @@ public class M_Transfer {
     }
 
     // Transfer to general account
-    public void transferGeneral (){
+    public void transferGeneral (BankList bankList, MyAccount myAccount){
         Scanner scanner = new Scanner(System.in);
         while (true){
             int getNumber = getAccountNumberFromUser(scanner);
             if (getNumber == -1){
                 continue;
+            } else if (getNumber == 0) {
+                break;
             }
-            GeneralBank targetAccount = findAccountGeneral(getNumber);
+            GeneralBank targetAccount = findAccountGeneral(getNumber, bankList);
             if (targetAccount == null){
                 System.out.println("Account not found. Please enter valid number account : ");
                 continue;
             }
-            int moneyInput = moneyToTransfer(scanner);
+            int moneyInput = moneyToTransfer(scanner, myAccount);
+
+            if (moneyInput == 0){
+                System.out.println("Cannot transfer 0");
+                continue;
+            }
 
             while (moneyInput == -1) {
                 System.out.println("Your balance is not enough.\n1. Check Balance\n2. Continue Transfer : ");
@@ -65,13 +76,13 @@ public class M_Transfer {
                 if (choice == 1){
                     System.out.println("Your balance : " + myAccount.getBalance());
                 }else if (choice == 2){
-                    moneyInput = moneyToTransfer(scanner);
+                    moneyInput = moneyToTransfer(scanner, myAccount);
                 }else {
                     System.out.println("Invalid input. Please choice 1 or 2");
                 }
             }
 
-            doTransfer(targetAccount, moneyInput);
+            doTransfer(targetAccount, moneyInput, myAccount);
             System.out.println("Your current balance : " + myAccount.getBalance());
             break;
         }
@@ -80,7 +91,7 @@ public class M_Transfer {
 
     private int getAccountNumberFromUser (Scanner scanner){
         try{
-            System.out.println("Enter an account number that you want to transfer : ");
+            System.out.println("Enter an account number that you want to transfer : (press 0 to cancel) ");
             return scanner.nextInt();
         }catch (InputMismatchException e){
             System.out.println("Invalid input. Please enter correct number : ");
@@ -89,7 +100,7 @@ public class M_Transfer {
         }
     }
 
-    private LocalBank findAccountLocal (int accountNumber){
+    private LocalBank findAccountLocal (int accountNumber, BankList bankList){
         for (Bank localbank : bankList.bankList){
             if (localbank.getAccountNumber() == accountNumber && localbank instanceof LocalBank){
                 return (LocalBank) localbank;
@@ -98,7 +109,7 @@ public class M_Transfer {
         return null;
     }
 
-    private GeneralBank findAccountGeneral (int accountNumber){
+    private GeneralBank findAccountGeneral (int accountNumber, BankList bankList){
         for (Bank generalBank : bankList.bankList){
             if (generalBank.getAccountNumber() == accountNumber && generalBank  instanceof  GeneralBank){
                 return (GeneralBank) generalBank;
@@ -107,12 +118,12 @@ public class M_Transfer {
         return null;
     }
 
-    private int moneyToTransfer (Scanner scanner){
+    private int moneyToTransfer (Scanner scanner, MyAccount myAccount){
 
         try {
-            System.out.println("Enter amount of money you want to transfer : ");
+            System.out.println("Enter amount of money you want to transfer :  ");
             int amountMoney = scanner.nextInt();
-            if (amountMoney > 0 && amountMoney < myAccount.getBalance()){
+            if (amountMoney < myAccount.getBalance()){
                 return amountMoney;
             }
         }catch (InputMismatchException e){
@@ -121,14 +132,14 @@ public class M_Transfer {
         }
         return -1;
     }
-    private void doTransfer (LocalBank localBank,  int money){
+    private void doTransfer (LocalBank localBank,  int money, MyAccount myAccount){
         myAccount.setBalance(myAccount.getBalance() - money);
         System.out.println("Transfer from " + myAccount.getUsername() + " to " +
                 localBank.getUsername() + " - " + localBank.getAccountNumber() +
                 " with nominal : " + money + " success");
     }
 
-    private void doTransfer (GeneralBank generalBank,  int money){
+    private void doTransfer (GeneralBank generalBank,  int money, MyAccount myAccount){
         myAccount.setBalance(myAccount.getBalance() - money);
         System.out.println("Transfer from " + myAccount.getUsername() + " to " +
                 generalBank.getUsername() + " - " + generalBank.getBankName() + " " + generalBank.getAccountNumber() +

@@ -1,41 +1,127 @@
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.util.Stack;
+
+
+
 public class Main {
+    static MyAccount myAccount = new MyAccount();
+    static LocalBank localBank;
+    GeneralBank generalBank;
+    M_Transfer mTransfer = new M_Transfer();
+    static BankList bankList = new BankList();
+    Login login = new Login();
+    Scanner scanner = new Scanner(System.in);
+    Stack<Integer> navigation = new Stack<>();
+    int i = 0;
+
     public static void main(String[] args) {
 
-        MyAccount myAccount = new MyAccount();
-        LocalBank localBank1 = new LocalBank(123, "Muhammad", 5000000);
-        LocalBank localBank2 = new LocalBank(124, "Ahmad", 1000000);
+        Main mainApp = new Main();
+
+        mainApp.run();
 
 
-        M_Transfer mTransfer1 = new M_Transfer();
-        mTransfer1.addAccount(localBank1);
-        mTransfer1.addAccount(localBank2);
-        mTransfer1.transfer(myAccount, localBank1);
-        System.out.println(myAccount.getBalance());
-//        if (1 == 1){
-//            System.out.println("Enter Access Code : ");
-//
-//            System.out.println("1. m-Info\n2. m-Transfer");
-//
-//            System.out.println("1. Register New account\n2. Transfer");
-//
-//            //if chose 1
-//            System.out.println("1. among our bank\n2. among banks");
-//
-//            // if chose 1, call method add account
-//            System.out.println("Enter account number :");
-//            System.out.println("Enter customer name : ");
-//            localBank = new LocalBank(1, "", 1000);
-//            mTransfer.addAccount(localBank);
-//
-//            // if chose 2, call method add account from other bank
-//            System.out.println("Enter Bank Name : ");
-//            System.out.println("Enter account number :");
-//            System.out.println("Enter customer name : ");
-//            otherBank = new OtherBank(1, "", "", 1000);
-//            mTransfer.addAccount(otherBank);
-//
-//            //if user chose transfer there are few options : among our bank, other bank, virtual account dan inbox
-//            //call among our bank
-//        }
     }
+
+    public void run() {
+        while (true){
+            System.out.println("Choose an option : \n1. Check Balance\n2. Transfer\n0. Quit");
+            int choice = scanner.nextInt();
+
+            switch (choice){
+                case 1 :
+                    System.out.println("My Balance : " + myAccount.getBalance() + "\n");
+                    break;
+                case 2 :
+                    while (true){
+                        System.out.println("""
+                            Chose option :
+                            1. Add account
+                            2. Add general account
+                            3. Transfer to local account
+                            4. Transfer to general account
+                            0. Quit""");
+                        int choiceTransfer = scanner.nextInt();
+
+                        if (choiceTransfer == 1){
+                            addLocalAccount(scanner);
+                        } else if (choiceTransfer == 2) {
+                            addGeneralAccount(scanner);
+                        } else if (choiceTransfer == 3 && bankList.displayLocalAccounts()) {
+                            mTransfer.transferLocal(bankList, myAccount);
+                        } else if (choiceTransfer == 4 && bankList.displayGeneralBankAccounts()) {
+                            mTransfer.transferGeneral(bankList, myAccount);
+                        } else if (choiceTransfer == 0) {
+                            break;
+                        } else if (choiceTransfer == 5) {
+                            bankList.displayAllBank();
+                        }
+                    }
+                    break;
+                case 0 :
+                    System.out.println("Thank you !!!");
+                    return;
+                default:
+                    System.out.println("Invalid input !");
+            }
+        }
+    }
+
+
+    public static int readInt (Scanner scanner, String prompt){
+        System.out.println(prompt);
+        int value = scanner.nextInt();
+        scanner.nextLine();
+        return value;
+    }
+    public static String readString (Scanner scanner, String prompt){
+        System.out.println(prompt);
+        return scanner.nextLine();
+    }
+    public static void addLocalAccount (Scanner s){
+        int accountNumber;
+        String username;
+        while (true){
+            try{
+                accountNumber= readInt(s, "Enter account Number : ");
+                break;
+            }catch (InputMismatchException e){
+                System.out.println("Please input invalid number");
+                s.nextLine();
+            }
+        }
+        while (true){
+            try {
+                username = readString(s, "Enter username : ");
+                break;
+            }catch (InputMismatchException e){
+                System.out.println("Please input invalid username");
+                s.nextLine();
+            }
+        }
+        bankList.addAccount(new LocalBank(accountNumber, username, 0));
+
+    }
+
+    public static void addGeneralAccount (Scanner s){
+        int accountNumber;
+        String username;
+        String bankName;
+
+        while (true){
+            try {
+                accountNumber = readInt(s, "Enter account number : ");
+                break;
+            }catch (InputMismatchException e){
+                System.out.println("Invalid input.");
+            }
+        }
+
+        username = readString(s, "Enter username : ");
+        bankName = readString(s, "Enter bank name : ");
+        bankList.addAccount(new GeneralBank(accountNumber, username, bankName, 0));
+    }
+
+
 }
